@@ -26,6 +26,10 @@ function in_range(range, num) {
 }
 exports.in_range = in_range;
 function risk_from_study(risk_json, input) {
+    if (util_1.isNullOrUndefined(risk_json))
+        throw TypeError('`risk_json` must be defined');
+    else if (util_1.isNullOrUndefined(input))
+        throw TypeError('`input` must be defined');
     function ensure_map(k) {
         if (k === 'map')
             return true;
@@ -40,3 +44,11 @@ function risk_from_study(risk_json, input) {
     return util_1.isNumber(out1) ? out1 : out1[study.expr[0].extract];
 }
 exports.risk_from_study = risk_from_study;
+function list_ethnicities(risk_json) {
+    if (util_1.isNullOrUndefined(risk_json))
+        throw TypeError('`risk_json` must be defined');
+    return Object.keys(risk_json.studies).map(k => {
+        return { [k]: risk_json.studies[k].ethnicities };
+    });
+}
+exports.list_ethnicities = list_ethnicities;
