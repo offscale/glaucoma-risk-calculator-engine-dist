@@ -61,6 +61,33 @@ function risk_from_study(risk_json, input) {
     return util_1.isNumber(out1) ? out1 : out1[study.expr[0].extract];
 }
 exports.risk_from_study = risk_from_study;
+function risks_from_study(risk_json, study) {
+    if (util_1.isNullOrUndefined(risk_json))
+        throw TypeError('`risk_json` must be defined');
+    else if (util_1.isNullOrUndefined(study))
+        throw TypeError('`study` must be defined');
+    function ensure_map(k) {
+        if (k === 'map')
+            return true;
+        throw TypeError("Expected map, got " + k);
+    }
+    var study_ = risk_json.studies[study];
+    var out0 = study_[study_.expr[0].key];
+    return out0.map(function (k) { return k[study_.expr[0].extract]; }).filter(function (k) { return !util_1.isNullOrUndefined(k); });
+}
+exports.risks_from_study = risks_from_study;
+function place_in_array(entry, a) {
+    if (util_1.isNullOrUndefined(entry))
+        throw TypeError('`entry` must be defined');
+    else if (util_1.isNullOrUndefined(a))
+        throw TypeError('`a` must be defined');
+    var sortedA = a.sort();
+    for (var i = 0; i < sortedA.length; i++)
+        if (sortedA[i] === entry)
+            return i;
+    return -1;
+}
+exports.place_in_array = place_in_array;
 function list_ethnicities(risk_json) {
     if (util_1.isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
