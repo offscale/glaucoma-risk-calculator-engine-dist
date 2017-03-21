@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("util");
+exports.risk_json = require('./risk');
 function in_range(range, num) {
     if (range === 'all' || range[0] === '_')
         return false;
