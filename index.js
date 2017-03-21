@@ -77,7 +77,11 @@ if (require.main === module) {
             if (err)
                 throw err;
             console.info('saved');
-            fs_exists && console.info(JSON.stringify(require('./risk'), null, '\t'));
+            fs_1.readFile('./risk.json', 'utf8', function (err, data) {
+                if (err)
+                    throw err;
+                console.info(data);
+            });
         });
     });
 }
