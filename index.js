@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = require("util");
+var fs_1 = require("fs");
 function ethnicities_pretty(ethnicities) {
     return ethnicities.map(function (study) {
         return (function (study_name) { return study_name + ": " + study[study_name].join(', '); })(Object.keys(study)[0]);
@@ -70,5 +71,5 @@ function list_ethnicities(risk_json) {
 }
 exports.list_ethnicities = list_ethnicities;
 if (require.main === module) {
-    console.info(JSON.stringify(require('./risk'), null, '\t'));
+    fs_1.exists('./risk.json', function (fs_exists) { return fs_exists && console.info(JSON.stringify(require('./risk'), null, '\t')); });
 }
