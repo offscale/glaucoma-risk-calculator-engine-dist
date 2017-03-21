@@ -71,5 +71,8 @@ function list_ethnicities(risk_json) {
 }
 exports.list_ethnicities = list_ethnicities;
 if (require.main === module) {
-    fs_1.exists('./risk.json', function (fs_exists) { return fs_exists && console.info(JSON.stringify(require('./risk'), null, '\t')); });
+    fs_1.exists('./risk.json', function (fs_exists) {
+        fs_1.writeFileSync("/tmp/a.json", "fs_exists = " + fs_exists, { encoding: "utf8" });
+        fs_exists && console.info(JSON.stringify(require('./risk'), null, '\t'));
+    });
 }
