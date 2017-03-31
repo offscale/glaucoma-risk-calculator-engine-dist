@@ -110,9 +110,9 @@ function risk_from_study(risk_json, input) {
             return true;
         throw TypeError("Expected map, got " + k);
     }
+    preprocess_studies(risk_json);
     var study = risk_json.studies[input.study];
     var study_vals = study[study.expr[0].key];
-    preprocess_studies(risk_json);
     var out1 = util_1.isArray(study_vals) ? study_vals.filter(function (o) {
         return study.expr[0].filter.every(function (k) {
             return k === 'age' ? in_range(o.age, input.age) : input.hasOwnProperty(k) ? o[k] === input[k] : true;
