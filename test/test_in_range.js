@@ -18,5 +18,6 @@ describe('test in_range', function () {
         chai_1.expect(__1.in_range('55>', 56)).to.be.true;
         chai_1.expect(__1.in_range('55>=', 66)).to.be.true;
         chai_1.expect(__1.in_range('55+', 50)).to.be.false;
+        chai_1.expect(__1.in_range('85+', 100)).to.be.true;
     });
 });

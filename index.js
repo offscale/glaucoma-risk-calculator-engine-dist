@@ -58,6 +58,17 @@ function uniq(a) {
     }).filter(function (k) { return k !== undefined; });
 }
 exports.uniq = uniq;
+function uniq2(arr) {
+    var keys = arr.length === 0 ? [] : Object.keys(arr[0]);
+    var seen = new Map();
+    arr.forEach(function (a) {
+        var key = keys.map(function (k) { return a[k]; }).join('|');
+        if (!seen.has(key))
+            seen.set(key, a);
+    });
+    return Array.from(seen.values());
+}
+exports.uniq2 = uniq2;
 function preprocess_studies(risk_json) {
     Object.keys(risk_json.studies).forEach(function (study_name) {
         if (risk_json.studies[study_name].hasOwnProperty('age')) {
@@ -65,6 +76,12 @@ function preprocess_studies(risk_json) {
             if (sr[0][0] !== '<') {
                 var lt = "<" + parseInt(sr[0]);
                 risk_json.studies[study_name].age = Object.assign((_a = {}, _a[lt] = risk_json.studies[study_name].age[sr[0]], _a), risk_json.studies[study_name].age);
+            }
+            if (['>', '+'].indexOf(sr[sr.length - 1][0].slice(-1)) === -1) {
+                var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1]), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
+                var top_bar = top_bars[top_bars.length - 1];
+                if (['>', '+'].indexOf(top_bar[1].slice(-1)) === -1)
+                    risk_json.studies[study_name].age[top_bar + "+"] = risk_json.studies[study_name].age[top_bar[1]];
             }
         }
         if (risk_json.studies[study_name].hasOwnProperty('agenda')) {
@@ -80,9 +97,14 @@ function preprocess_studies(risk_json) {
                     var lt = parseInt(lowest_bar_1);
                     assert(!isNaN(lt), lowest_bar_1 + " unexpectedly pareses to NaN");
                     risk_json.studies[study_name].agenda.unshift(Object.assign({}, risk_json.studies[study_name].agenda.filter(function (agenda) { return agenda.age === lowest_bar_1 && agenda.gender === gender; })[0], { age: "<" + lt }));
+                    var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1]), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
+                    var top_bar_1 = top_bars[top_bars.length - 1];
+                    if (top_bar_1)
+                        risk_json.studies[study_name].agenda.push(risk_json.studies[study_name].agenda.filter(function (agenda) { return agenda.age === top_bar_1[1] && agenda.gender === gender; }).map(function (o) { return Object.assign({}, o, { age: top_bar_1[0] + "+" }); })[0]);
                 }
             });
             assert.equal(gendersAssigned_1, all_genders_seen.length, 'Genders assigned != all genders');
+            risk_json.studies[study_name].agenda = uniq2(risk_json.studies[study_name].agenda);
         }
         var _a;
     });
@@ -113,7 +135,7 @@ function risk_from_study(risk_json, input) {
     preprocess_studies(risk_json);
     var study = risk_json.studies[input.study];
     var study_vals = study[study.expr[0].key];
-    var out1 = util_1.isArray(study_vals) ? study_vals.filter(function (o) {
+    var out = util_1.isArray(study_vals) ? study_vals.filter(function (o) {
         return study.expr[0].filter.every(function (k) {
             return k === 'age' ? in_range(o.age, input.age) : input.hasOwnProperty(k) ? o[k] === input[k] : true;
         });
@@ -121,25 +143,25 @@ function risk_from_study(risk_json, input) {
         : study_vals[ensure_map(study.expr[0].type) && Object.keys(study_vals).filter(function (k) {
             return in_range(k, input[study.expr[0].key]);
         })[study.expr[0].take - 1]];
-    if (!out1)
+    if (!out)
         throw TypeError('Expected out to match something');
-    return util_1.isNumber(out1) ? out1 : out1[study.expr[0].extract];
+    return util_1.isNumber(out) ? out : out[study.expr[0].extract];
 }
 exports.risk_from_study = risk_from_study;
-function risks_from_study(risk_json, study_name) {
+function risks_from_study(risk_json, input) {
     if (util_1.isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
-    else if (util_1.isNullOrUndefined(study_name))
-        throw TypeError('`study_name` must be defined');
+    else if (util_1.isNullOrUndefined(input))
+        throw TypeError('`input` must be defined');
     preprocess_studies(risk_json);
-    var study = risk_json.studies[study_name];
+    var study = risk_json.studies[input.study];
     var study_vals = study[study.expr[0].key];
-    var out1 = util_1.isArray(study_vals) ?
-        study_vals.map(function (o) { return o[study.expr[0].extract]; })
+    var out = util_1.isArray(study_vals) ?
+        study_vals.filter(function (o) { return input.gender ? o.gender === input.gender : true; }).map(function (o) { return o[study.expr[0].extract]; })
         : ensure_map(study.expr[0].type) && Object.keys(study_vals).filter(function (k) { return ['a', '_'].indexOf(k[0]) === -1; }).map(function (k) { return study_vals[k]; });
-    if (!out1)
+    if (!out)
         throw TypeError('Expected out to match something');
-    return uniq(out1);
+    return uniq(out);
 }
 exports.risks_from_study = risks_from_study;
 function place_in_array(entry, a) {
