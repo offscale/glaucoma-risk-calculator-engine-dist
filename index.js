@@ -136,10 +136,10 @@ function risks_from_study(risk_json, study_name) {
     var study_vals = study[study.expr[0].key];
     var out1 = util_1.isArray(study_vals) ?
         study_vals.map(function (o) { return o[study.expr[0].extract]; })
-        : ensure_map(study.expr[0].type) && Object.values(study_vals);
+        : ensure_map(study.expr[0].type) && Object.keys(study_vals).filter(function (k) { return ['a', '_'].indexOf(k[0]) === -1; }).map(function (k) { return study_vals[k]; });
     if (!out1)
         throw TypeError('Expected out to match something');
-    return out1;
+    return uniq(out1);
 }
 exports.risks_from_study = risks_from_study;
 function place_in_array(entry, a) {
