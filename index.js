@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = require("util");
 var fs_1 = require("fs");
 var assert = require("assert");
+var math = require("mathjs");
 function ethnicities_pretty(ethnicities) {
     return ethnicities.map(function (study) {
         return (function (study_name) { return study_name + ": " + study[study_name].join(', '); })(Object.keys(study)[0]);
@@ -145,9 +146,32 @@ function risk_from_study(risk_json, input) {
         })[study.expr[0].take - 1]];
     if (!out)
         throw TypeError('Expected out to match something');
-    return util_1.isNumber(out) ? out : out[study.expr[0].extract];
+    var risk = util_1.isNumber(out) ? out : out[study.expr[0].extract];
+    return risk;
 }
 exports.risk_from_study = risk_from_study;
+function familial_risks_from_study(risk_json, input, warn) {
+    if (warn === void 0) { warn = true; }
+    var study = risk_json.studies[input.study];
+    var res = [];
+    if (!study.hasOwnProperty('sibling_pc')) {
+        warn && console.warn("Using sibling from " + risk_json.default_family_history.from_study);
+        study['sibling_pc'] = risk_json.default_family_history.sibling_pc;
+    }
+    input.sibling && res.push(study['sibling_pc']);
+    if (!study.hasOwnProperty('parents_pc')) {
+        warn && console.warn("Using parents_pc from " + risk_json.default_family_history.from_study);
+        study['parents_pc'] = risk_json.default_family_history.parents_pc;
+        risk_json.default_family_history.ref.forEach(function (ref) { return study.ref.push(ref); });
+    }
+    input.parent && res.push(study['sibling_pc']);
+    return res;
+}
+exports.familial_risks_from_study = familial_risks_from_study;
+function combined_risk(familial_risks_from_study_l, risk_from_study) {
+    return math.add(familial_risks_from_study_l.map(function (r) { return math.multiply(math.divide(r, 100), risk_from_study); }).reduce(math.add), risk_from_study);
+}
+exports.combined_risk = combined_risk;
 function risks_from_study(risk_json, input) {
     if (util_1.isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
