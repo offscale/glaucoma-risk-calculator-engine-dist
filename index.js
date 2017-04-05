@@ -113,13 +113,16 @@ function preprocess_studies(risk_json) {
 }
 exports.preprocess_studies = preprocess_studies;
 function sort_ranges(ranges) {
-    var collator = new Intl.Collator(undefined, {
-        numeric: true,
-        sensitivity: 'base',
-        ignorePunctuation: true
-    });
     return ranges.sort(function (a, b) {
-        return a[0] === '>' && !isNaN(parseInt(b[0])) ? 1 : collator.compare(a, b);
+        if (a[0] === '<')
+            return -1;
+        else if (a[0] === '>')
+            return a[0].charCodeAt(0) - b[0].charCodeAt(0);
+        else if (isNaN(parseInt(a[0])) || b[0] === '<')
+            return 1;
+        else if (b[0] === '>' || isNaN(parseInt(b[0])))
+            return -1;
+        return parseInt(a.split('-')[0]) - parseInt(b.split('-')[0]);
     });
 }
 exports.sort_ranges = sort_ranges;
@@ -200,6 +203,14 @@ function place_in_array(entry, a) {
     return -1;
 }
 exports.place_in_array = place_in_array;
+function pos_in_range(ranges, num) {
+    ranges = sort_ranges(ranges);
+    for (var i = 0; i < ranges.length; i++)
+        if (in_range(ranges[i], num))
+            return i;
+    return -1;
+}
+exports.pos_in_range = pos_in_range;
 function list_ethnicities(risk_json) {
     if (util_1.isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
