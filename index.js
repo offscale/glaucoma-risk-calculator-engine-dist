@@ -19,12 +19,12 @@ function in_range(range, num) {
         return false;
     var dash = range.indexOf('-');
     if (dash !== -1)
-        return num >= parseInt(range.slice(0, dash - range.length)) && num <= parseInt(range.slice(-dash));
+        return num >= parseInt(range.slice(0, dash - range.length), 10) && num <= parseInt(range.slice(-dash), 10);
     var last = range.slice(-2);
-    if (!isNaN(parseInt(last[0])))
+    if (!isNaN(parseInt(last[0], 10)))
         last = last[1];
-    if (isNaN(parseInt(last))) {
-        var rest_1 = parseInt(range);
+    if (isNaN(parseInt(last, 10))) {
+        var rest_1 = parseInt(range, 10);
         var operators = Object.freeze({
             '>': num > rest_1,
             '+': num >= rest_1,
@@ -35,11 +35,12 @@ function in_range(range, num) {
             throw TypeError("Invalid operation of `" + last + "`");
         return operators[last];
     }
-    var op = range.slice(0, 2), rest = parseInt(range.slice(2));
+    var op = range.slice(0, 2);
+    var rest = parseInt(range.slice(2), 10);
     if (op === '<=' || op === '=<')
         return num <= rest;
     else if (op[0] === '<')
-        return num < parseInt(range.slice(1));
+        return num < parseInt(range.slice(1), 10);
     else if (op === '>=' || op === '=>')
         return num >= rest;
     return range === num;
@@ -47,7 +48,7 @@ function in_range(range, num) {
 exports.in_range = in_range;
 function lowest_range(ranges) {
     return ranges.reduce(function (prevNum, currentValue) {
-        var curNum = parseInt(currentValue);
+        var curNum = parseInt(currentValue, 10);
         return curNum < prevNum ? curNum : prevNum;
     }, 100);
 }
@@ -75,11 +76,11 @@ function preprocess_studies(risk_json) {
         if (risk_json.studies[study_name].hasOwnProperty('age')) {
             var sr = sort_ranges(Object.keys(risk_json.studies[study_name].age));
             if (sr[0][0] !== '<') {
-                var lt = "<" + parseInt(sr[0]);
+                var lt = "<" + parseInt(sr[0], 10);
                 risk_json.studies[study_name].age = Object.assign((_a = {}, _a[lt] = risk_json.studies[study_name].age[sr[0]], _a), risk_json.studies[study_name].age);
             }
             if (['>', '+'].indexOf(sr[sr.length - 1][0].slice(-1)) === -1) {
-                var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1]), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
+                var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1], 10), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
                 var top_bar = top_bars[top_bars.length - 1];
                 if (['>', '+'].indexOf(top_bar[1].slice(-1)) === -1)
                     risk_json.studies[study_name].age[top_bar + "+"] = risk_json.studies[study_name].age[top_bar[1]];
@@ -95,10 +96,10 @@ function preprocess_studies(risk_json) {
                 if (sr.length) {
                     var lowest_bar_1 = sr.find(function (o) { return ['=<', '<='].indexOf(o.slice(0, 2)) === -1 && ['<', '>'].indexOf(o[0][0]) === -1; });
                     gendersAssigned_1++;
-                    var lt = parseInt(lowest_bar_1);
+                    var lt = parseInt(lowest_bar_1, 10);
                     assert(!isNaN(lt), lowest_bar_1 + " unexpectedly pareses to NaN");
                     risk_json.studies[study_name].agenda.unshift(Object.assign({}, risk_json.studies[study_name].agenda.filter(function (agenda) { return agenda.age === lowest_bar_1 && agenda.gender === gender; })[0], { age: "<" + lt }));
-                    var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1]), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
+                    var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1], 10), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
                     var top_bar_1 = top_bars[top_bars.length - 1];
                     if (top_bar_1)
                         risk_json.studies[study_name].agenda.push(risk_json.studies[study_name].agenda.filter(function (agenda) { return agenda.age === top_bar_1[1] && agenda.gender === gender; }).map(function (o) { return Object.assign({}, o, { age: top_bar_1[0] + "+" }); })[0]);
@@ -118,11 +119,11 @@ function sort_ranges(ranges) {
             return -1;
         else if (a[0] === '>')
             return a[0].charCodeAt(0) - b[0].charCodeAt(0);
-        else if (isNaN(parseInt(a[0])) || b[0] === '<')
+        else if (isNaN(parseInt(a[0], 10)) || b[0] === '<')
             return 1;
-        else if (b[0] === '>' || isNaN(parseInt(b[0])))
+        else if (b[0] === '>' || isNaN(parseInt(b[0], 10)))
             return -1;
-        return parseInt(a.split('-')[0]) - parseInt(b.split('-')[0]);
+        return parseInt(a.split('-')[0], 10) - parseInt(b.split('-')[0], 10);
     });
 }
 exports.sort_ranges = sort_ranges;
@@ -149,8 +150,7 @@ function risk_from_study(risk_json, input) {
         })[study.expr[0].take - 1]];
     if (!out)
         throw TypeError('Expected out to match something');
-    var risk = util_1.isNumber(out) ? out : out[study.expr[0].extract];
-    return risk;
+    return util_1.isNumber(out) ? out : out[study.expr[0].extract];
 }
 exports.risk_from_study = risk_from_study;
 function familial_risks_from_study(risk_json, input, warn) {
@@ -223,13 +223,12 @@ exports.list_ethnicities = list_ethnicities;
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {
         console.error("fs_exists = " + fs_exists);
-        fs_1.writeFile("/tmp/a.txt", "fs_exists = " + fs_exists, function (err) {
+        fs_1.writeFile('/tmp/a.txt', "fs_exists = " + fs_exists, function (err) {
             if (err)
                 throw err;
-            console.info('saved');
-            fs_1.readFile('./risk.json', 'utf8', function (err, data) {
-                if (err)
-                    throw err;
+            fs_1.readFile('./risk.json', 'utf8', function (e, data) {
+                if (e)
+                    throw e;
                 console.info(data);
             });
         });
