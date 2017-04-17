@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", {value: true});
+Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
 var __1 = require("./..");
 var risk_json = require('../risk');

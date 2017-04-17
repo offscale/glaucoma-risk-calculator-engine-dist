@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
 var __1 = require("./..");
-function shuffleArray(array) {
+var shuffleArray = function (array) {
     array = array.slice(0);
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
@@ -11,7 +11,7 @@ function shuffleArray(array) {
         array[j] = temp;
     }
     return array;
-}
+};
 describe('range sorting', function () {
     it('sorts with `all`, `num+` and `_denominator`', function () {
         chai_1.expect(__1.sort_ranges(['65-74', 'all', '75+', '30-65', '_denominator'])).to.be.eql([

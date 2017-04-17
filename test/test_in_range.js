@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", {value: true});
+Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
 var _1 = require("../");
 describe('tests in range', function () {
