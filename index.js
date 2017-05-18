@@ -203,6 +203,16 @@ exports.list_ethnicities = function (risk_json) {
         var _a;
     });
 };
+exports.ethnicity2study = function (risk_json) {
+    var o = {};
+    Object.keys(risk_json.studies).map(function (study_name) {
+        return risk_json.studies[study_name].ethnicities.map(function (ethnicity) {
+            return (_a = {}, _a[ethnicity] = study_name, _a);
+            var _a;
+        });
+    }).reduce(function (a, b) { return a.concat(b); }, []).forEach(function (obj) { return Object.assign(o, obj); });
+    return o;
+};
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {
         console.error("fs_exists = " + fs_exists);
