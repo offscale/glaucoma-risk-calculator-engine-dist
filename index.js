@@ -217,10 +217,10 @@ exports.calc_default_multiplicative_risks = function (risk_json, user) {
     return {
         age: risk_json.default_multiplicative_risks.age[Object.keys(risk_json.default_multiplicative_risks.age).filter(function (range) {
             return exports.in_range(range, user.age);
-        })[0]] + "x",
-        myopia: (user.myopia ? risk_json.default_multiplicative_risks.myopia.existent : 1) + "x",
-        family_history: (user.family_history ? risk_json.default_multiplicative_risks.family_history.existent : 1) + "x",
-        diabetes: (user.diabetes ? risk_json.default_multiplicative_risks.diabetes.existent : 1) + "x"
+        })[0]],
+        myopia: user.myopia ? risk_json.default_multiplicative_risks.myopia.existent : 1,
+        family_history: user.family_history ? risk_json.default_multiplicative_risks.family_history.existent : 1,
+        diabetes: user.diabetes ? risk_json.default_multiplicative_risks.diabetes.existent : 1
     };
 };
 if (require.main === module) {
