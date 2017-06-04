@@ -18,15 +18,15 @@ describe('test calc', function () {
         it('calculates risk_from_study', function () {
             chai_1.expect(__1.risk_from_study(risk_json, Object.assign({
                 study: study
-            }, trans[0]))).to.eql(4.1);
+            }, trans[0]))).to.eql(4.6);
             chai_1.expect(__1.risk_from_study(risk_json, Object.assign({
                 study: study
-            }, trans[1]))).to.eql(2.4);
+            }, trans[1]))).to.eql(1);
         });
         it('correctly identifies most at risk', function () {
             var input = Object.assign({ study: study }, trans[2]);
             var risk = __1.risk_from_study(risk_json, input);
-            chai_1.expect(risk).to.eql(8.2);
+            chai_1.expect(risk).to.eql(24.8);
             var risks = __1.risks_from_study(risk_json, input);
             chai_1.expect(math.divide(risks.lastIndexOf(risk) + 1, risks.length)).to.eql(1);
         });
@@ -36,7 +36,7 @@ describe('test calc', function () {
             var no_fam_risk = __1.risk_from_study(risk_json, no_fam);
             var fam_risk_from_study = __1.risk_from_study(risk_json, fam);
             var fam_risk = __1.combined_risk(__1.familial_risks_from_study(risk_json, fam), fam_risk_from_study);
-            chai_1.expect(no_fam_risk).to.eql(4.1);
+            chai_1.expect(no_fam_risk).to.eql(4.6);
             chai_1.expect(fam_risk).to.be.gt(no_fam_risk);
         });
     });

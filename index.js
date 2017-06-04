@@ -223,6 +223,36 @@ exports.calc_default_multiplicative_risks = function (risk_json, user) {
         diabetes: user.diabetes ? risk_json.default_multiplicative_risks.diabetes.existent : 1
     };
 };
+exports.calc_relative_risk = function (risk_json, input) {
+    var has_gender = input.gender != null;
+    var risk_per_study = has_gender ? Object.keys(risk_json.studies).map(function (study_name) {
+        return (_a = {},
+            _a[study_name] = risk_json.studies[study_name].agenda != null ? risk_json.studies[study_name].agenda.filter(function (stat) {
+                return input.gender === stat.gender && exports.in_range(stat.age, input.age);
+            })[0] : (function (age_range) { return ({
+                max_prevalence: risk_json.studies[study_name].age[age_range],
+                age: age_range[0]
+            }); })(Object.keys(risk_json.studies[study_name].age).filter(function (age_range) { return exports.in_range(age_range, input.age); })),
+            _a);
+        var _a;
+    }).reduce(function (obj, item) {
+        var k = Object.keys(item)[0];
+        obj[k] = item[k];
+        return obj;
+    }, {}) : null;
+    return Object.assign({
+        age: input.age,
+        study: input.study,
+        relative_risk: Object.keys(risk_per_study).map(function (study_name) {
+            return (_a = {},
+                _a[study_name] = risk_per_study[study_name][Object.keys(risk_per_study[study_name]).indexOf('max_prevalence') > -1 ?
+                    'max_prevalence' : 'meth3_prevalence'],
+                _a);
+            var _a;
+        }).sort(function (a, b) { return a[Object.keys(a)[0]] > b[Object.keys(b)[0]]; }),
+        risk_per_study: risk_per_study
+    }, has_gender ? { gender: input.gender } : {});
+};
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {
         console.error("fs_exists = " + fs_exists);
