@@ -248,8 +248,8 @@ exports.calc_relative_risk = function (risk_json, input) {
         var _a;
     }).sort(function (a, b) { return a[Object.keys(a)[0]] > b[Object.keys(b)[0]]; });
     var graphed_rr = relative_risk.map(function (atoi) {
-        var k = Object.keys(atoi)[0];
-        return { name: k, size: atoi[k], value: atoi[k] };
+        var study_name = Object.keys(atoi)[0];
+        return { name: risk_json.studies[study_name].ethnicities[0], size: atoi[study_name], value: atoi[study_name] };
     });
     return Object.assign({
         age: input.age,
