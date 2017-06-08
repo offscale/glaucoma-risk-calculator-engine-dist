@@ -240,9 +240,40 @@ exports.calc_relative_risk = function (risk_json, input) {
         obj[k] = item[k];
         return obj;
     }, {}) : null;
+    var relative_risk = Object.keys(risk_per_study).map(function (study_name) {
+        return (_a = {},
+            _a[study_name] = risk_per_study[study_name][Object.keys(risk_per_study[study_name]).indexOf('max_prevalence') > -1 ?
+                'max_prevalence' : 'meth3_prevalence'],
+            _a);
+        var _a;
+    }).sort(function (a, b) { return a[Object.keys(a)[0]] > b[Object.keys(b)[0]]; });
+    var graphed_rr = relative_risk.map(function (atoi) {
+        var k = Object.keys(atoi)[0];
+        return { name: k, size: atoi[k], value: atoi[k] };
+    });
     return Object.assign({
         age: input.age,
         study: input.study,
+        relative_risk: relative_risk,
+        risk_per_study: risk_per_study,
+        graphed_rr: graphed_rr
+    }, has_gender ? { gender: input.gender } : {});
+};
+exports.all_studies_relative_risk = function (risk_json) {
+    var risk_per_study = Object.keys(risk_json.studies).map(function (study_name) {
+        return (_a = {},
+            _a[study_name] = risk_json.studies[study_name].agenda != null ? risk_json.studies[study_name].agenda : (function (age_range) { return ({
+                max_prevalence: risk_json.studies[study_name].age[age_range],
+                age: age_range[0]
+            }); })(Object.keys(risk_json.studies[study_name].age)),
+            _a);
+        var _a;
+    }).reduce(function (obj, item) {
+        var k = Object.keys(item)[0];
+        obj[k] = item[k];
+        return obj;
+    }, {});
+    return {
         relative_risk: Object.keys(risk_per_study).map(function (study_name) {
             return (_a = {},
                 _a[study_name] = risk_per_study[study_name][Object.keys(risk_per_study[study_name]).indexOf('max_prevalence') > -1 ?
@@ -251,7 +282,7 @@ exports.calc_relative_risk = function (risk_json, input) {
             var _a;
         }).sort(function (a, b) { return a[Object.keys(a)[0]] > b[Object.keys(b)[0]]; }),
         risk_per_study: risk_per_study
-    }, has_gender ? { gender: input.gender } : {});
+    };
 };
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {
