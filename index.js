@@ -284,6 +284,11 @@ exports.all_studies_relative_risk = function (risk_json) {
         risk_per_study: risk_per_study
     };
 };
+exports.get_all_refs = function (risk_json) {
+    return exports.uniq2(Object.keys(risk_json.studies).map(function (study) { return risk_json.studies[study].ref; }).reduce(function (a, b) {
+        return a.concat(b);
+    }));
+};
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {
         console.error("fs_exists = " + fs_exists);

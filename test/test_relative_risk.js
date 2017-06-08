@@ -15,11 +15,23 @@ describe('test calc_relative_risk', function () {
     describe('barbados', function () {
         var study = 'barbados';
         it('calculates relative risk', function () {
+            console.info(JSON.stringify(__1.calc_relative_risk(risk_json, Object.assign({
+                study: study
+            }, trans[0])).graphed_rr));
             chai_1.expect(__1.calc_relative_risk(risk_json, Object.assign({
                 study: study
             }, trans[0]))).to.eql({
                 age: 55,
                 study: 'barbados',
+                graphed_rr: [{ "name": "framingham", "size": 0.012, "value": 0.012 }, {
+                        "name": "barbados",
+                        "size": 4.6,
+                        "value": 4.6
+                    }, { "name": "ghana", "size": 6.5, "value": 6.5 }, {
+                        "name": "olmsted",
+                        "size": 11.326078497068,
+                        "value": 11.326078497068
+                    }],
                 relative_risk: [
                     {
                         framingham: 0.012
