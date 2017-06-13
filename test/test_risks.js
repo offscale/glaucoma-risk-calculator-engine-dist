@@ -12,19 +12,17 @@ describe('tests risks', function () {
         chai_1.expect(__1.place_in_array(24.8, risk_distribution)).to.eql(risk_distribution.lastIndexOf(24.8));
     });
     it('framingham', function () {
-        var risk_distribution = [0.005, 0.008, 0.012, 0.022, 0.029, 0.056, 0.011, 0.039, 0.016, 0.017, 0.047];
+        var risk_distribution = [0.8, 0.5, 1.2, 2.2, 2.9, 5.6, 1.1, 3.9, 1.6, 1.7, 4.7];
         chai_1.expect(__1.risks_from_study(risk_json, { study: 'framingham', age: null })).to.have.members(risk_distribution);
-        chai_1.expect(__1.place_in_array(0.005, risk_distribution)).to.eql(0);
-        chai_1.expect(__1.place_in_array(0.011, risk_distribution)).to.eql(risk_distribution.indexOf(0.011));
-        chai_1.expect(__1.place_in_array(0.047, risk_distribution)).to.eql(risk_distribution.lastIndexOf(0.047));
+        chai_1.expect(__1.place_in_array(0.5, risk_distribution)).to.eql(0);
+        chai_1.expect(__1.place_in_array(1.1, risk_distribution)).to.eql(risk_distribution.indexOf(1.1));
+        chai_1.expect(__1.place_in_array(4.7, risk_distribution)).to.eql(risk_distribution.lastIndexOf(4.7));
     });
     it('olmsted', function () {
-        var risk_distribution = [
-            1.89549249600724, 2.73716568581642, 11.326078497068, 30, 94.5570698594758, 73.8103215395919
-        ];
+        var risk_distribution = [0.1895492496, 0.2737165686, 1.13260785, 3, 9.455706986, 7.381032154];
         chai_1.expect(__1.risks_from_study(risk_json, { study: 'olmsted', age: null })).to.have.members(risk_distribution);
-        chai_1.expect(__1.place_in_array(1.89549249600724, risk_distribution)).to.eql(0);
-        chai_1.expect(__1.place_in_array(11.326078497068, risk_distribution)).to.eql(risk_distribution.indexOf(11.326078497068));
-        chai_1.expect(__1.place_in_array(73.8103215395919, risk_distribution)).to.eql(risk_distribution.lastIndexOf(73.8103215395919));
+        chai_1.expect(__1.place_in_array(0.1895492496, risk_distribution)).to.eql(0);
+        chai_1.expect(__1.place_in_array(1.13260785, risk_distribution)).to.eql(risk_distribution.indexOf(1.13260785));
+        chai_1.expect(__1.place_in_array(7.381032154, risk_distribution)).to.eql(risk_distribution.lastIndexOf(7.381032154));
     });
 });
