@@ -262,7 +262,8 @@ exports.calc_relative_risk = function (risk_json, input) {
 exports.all_studies_relative_risk = function (risk_json) {
     var risk_per_study = Object.keys(risk_json.studies).map(function (study_name) {
         return (_a = {},
-            _a[study_name] = risk_json.studies[study_name].agenda != null ? risk_json.studies[study_name].agenda : (function (age_range) { return ({
+            _a[study_name] = risk_json.studies[study_name].agenda != null ?
+                risk_json.studies[study_name].agenda : (function (age_range) { return ({
                 max_prevalence: risk_json.studies[study_name].age[age_range],
                 age: age_range[0]
             }); })(Object.keys(risk_json.studies[study_name].age)),
@@ -287,7 +288,7 @@ exports.all_studies_relative_risk = function (risk_json) {
 exports.get_all_refs = function (risk_json) {
     return exports.uniq2(Object.keys(risk_json.studies).map(function (study) { return risk_json.studies[study].ref; }).reduce(function (a, b) {
         return a.concat(b);
-    }));
+    })).filter(function (o) { return !Array.isArray(o); });
 };
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {
