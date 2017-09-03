@@ -20,12 +20,12 @@ exports.in_range = function (range, num) {
     if (!isNaN(parseInt(last[0], 10)))
         last = last[1];
     if (isNaN(parseInt(last, 10))) {
-        var rest_1 = parseInt(range, 10);
+        var _rest = parseInt(range, 10);
         var operators = Object.freeze({
-            '>': num > rest_1,
-            '+': num >= rest_1,
-            '>=': num >= rest_1,
-            '=>': num >= rest_1
+            '>': num > _rest,
+            '+': num >= _rest,
+            '>=': num >= _rest,
+            '=>': num >= _rest
         });
         if (Object.keys(operators).indexOf(last) === -1)
             throw TypeError("Invalid operation of `" + last + "`");
@@ -66,17 +66,22 @@ exports.uniq2 = function (arr) {
 exports.preprocess_studies = function (risk_json) {
     Object.keys(risk_json.studies).forEach(function (study_name) {
         if (risk_json.studies[study_name].hasOwnProperty('age')) {
+            if (!risk_json.studies[study_name].hasOwnProperty('age_map') || !risk_json.studies[study_name].age_map.size)
+                risk_json.studies[study_name].age_map = new Map();
             var sr = exports.sort_ranges(Object.keys(risk_json.studies[study_name].age));
             if (sr[0][0] !== '<') {
                 var lt = "<" + parseInt(sr[0], 10);
                 risk_json.studies[study_name].age = Object.assign((_a = {}, _a[lt] = risk_json.studies[study_name].age[sr[0]], _a), risk_json.studies[study_name].age);
+                risk_json.studies[study_name].age_map.set(lt, risk_json.studies[study_name].age[sr[0]]);
             }
             if (['>', '+'].indexOf(sr[sr.length - 1][0].slice(-1)) === -1) {
                 var top_bars = sr.map(function (r) { return [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1], 10), r]; }).filter(function (n) { return !isNaN(n[0]); }).sort();
                 var top_bar = top_bars[top_bars.length - 1];
-                if (['>', '+'].indexOf(top_bar[1].slice(-1)) === -1)
+                if (['>', '+'].indexOf(top_bar[1].slice(-1)) === -1) {
                     risk_json.studies[study_name].age[top_bar + "+"] = risk_json.studies[study_name].age[top_bar[1]];
+                }
             }
+            risk_json.studies[study_name].age_map.set(sr[0], risk_json.studies[study_name].age[sr[0]]);
         }
         if (risk_json.studies[study_name].hasOwnProperty('agenda')) {
             var all_genders_seen = exports.uniq(risk_json.studies[study_name].agenda.map(function (agenda) { return agenda.gender; }));
@@ -286,9 +291,7 @@ exports.all_studies_relative_risk = function (risk_json) {
     };
 };
 exports.get_all_refs = function (risk_json) {
-    return exports.uniq2(Object.keys(risk_json.studies).map(function (study) { return risk_json.studies[study].ref; }).reduce(function (a, b) {
-        return a.concat(b);
-    })).filter(function (o) { return !Array.isArray(o); });
+    return (Object.keys(risk_json.studies).map(function (study) { return risk_json.studies[study].ref; }));
 };
 if (require.main === module) {
     fs_1.exists('./risk.json', function (fs_exists) {

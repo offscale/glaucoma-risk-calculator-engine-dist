@@ -20,6 +20,9 @@ describe('range sorting', function () {
         chai_1.expect(__1.sort_ranges(['>=70', '40-49', '50-59', '60-69', 'all'])).to.be.eql([
             '40-49', '50-59', '60-69', '>=70', 'all'
         ]);
+        chai_1.expect(__1.sort_ranges(['65-74', '75+', '<65', 'all', '_denominator'])).to.be.eql([
+            '<65', '65-74', '75+', '_denominator', 'all'
+        ]);
     });
     it('sorts with `<num`, `>=` and random shuffling', function () {
         var arr = ['<40', '40-49', '50-59', '60-69', '>=70'];
