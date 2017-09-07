@@ -19,6 +19,14 @@ describe('test calc_relative_risk', () => {
             chai_1.expect(_1.calc_relative_risk(risk_json, Object.assign({ study }, trans[0]))).to.eql({
                 age: 55,
                 study: 'barbados',
+                rr: [
+                    { olmsted: 1.13260785 },
+                    { framingham: 1.2 },
+                    { singapore: 2.6 },
+                    { barbados: 4.6 },
+                    { ghana: 6.5 },
+                    { japanese: 7.7 }
+                ],
                 risk_per_study: {
                     barbados: {
                         _denominator: 100,
@@ -46,12 +54,12 @@ describe('test calc_relative_risk', () => {
                     }
                 },
                 graphed_rr: [
+                    { name: 'White [Olmsted]', size: 1.13260785, value: 1.13260785 },
                     { name: 'White [Framingham]', size: 1.2, value: 1.2 },
+                    { name: 'Chinese [Singapore: urban]', size: 2.6, value: 2.6 },
                     { name: 'Black [Barbados]', size: 4.6, value: 4.6 },
                     { name: 'Black [Ghana]', size: 6.5, value: 6.5 },
-                    { name: 'Tajima [Japanese]', size: 7.7, value: 7.7 },
-                    { name: 'White [Olmsted]', size: 1.13260785, value: 1.13260785 },
-                    { name: 'Chinese [Singapore: urban]', size: 2.6, value: 2.6 }
+                    { name: 'Tajima [Japanese]', size: 7.7, value: 7.7 }
                 ],
                 gender: 'male'
             });
