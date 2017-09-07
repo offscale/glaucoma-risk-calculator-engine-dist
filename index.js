@@ -89,7 +89,9 @@ exports.preprocess_studies = (risk_json) => {
                     const top_bars = sr.map(r => [parseInt(r.indexOf('-') === -1 ? r : r.split('-')[1], 10), r]).filter((n) => !isNaN(n[0])).sort();
                     const top_bar = top_bars[top_bars.length - 1];
                     if (top_bar)
-                        risk_json.studies[study_name].agenda.push(risk_json.studies[study_name].agenda.filter(agenda => agenda.age === top_bar[1] && agenda.gender === gender).map(o => Object.assign({}, o, { age: `${top_bar[0]}+` }))[0]);
+                        risk_json.studies[study_name].agenda.push(risk_json.studies[study_name].agenda
+                            .filter(agenda => agenda.age === top_bar[1] && agenda.gender === gender)
+                            .map(o => Object.assign({}, o, { age: `${top_bar[0]}+` }))[0]);
                 }
             });
             assert.equal(gendersAssigned, all_genders_seen.length, 'Genders assigned != all genders');
@@ -144,7 +146,9 @@ exports.familial_risks_from_study = (risk_json, input, warn = true) => {
     input.parent && res.push(study['sibling_pc']);
     return res;
 };
-exports.combined_risk = (familial_risks_from_study_l, risk_from_studies) => math.add(familial_risks_from_study_l.map(r => math.multiply(math.divide(r, 100), risk_from_studies)).reduce(math.add), risk_from_studies);
+exports.combined_risk = (familial_risks_from_study_l, risk_from_studies) => math.add(familial_risks_from_study_l
+    .map(r => math.multiply(math.divide(r, 100), risk_from_studies))
+    .reduce(math.add), risk_from_studies);
 exports.risks_from_study = (risk_json, input) => {
     if (util_1.isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
@@ -154,8 +158,14 @@ exports.risks_from_study = (risk_json, input) => {
     const study = risk_json.studies[input.study];
     const study_vals = study[study.expr[0].key];
     const out = util_1.isArray(study_vals) ?
-        study_vals.filter(o => input.gender ? o.gender === input.gender : true).map(o => o[study.expr[0].extract])
-        : ensure_map(study.expr[0].type) && Object.keys(study_vals).filter(k => ['a', '_'].indexOf(k[0]) === -1).map(k => study_vals[k]);
+        study_vals
+            .filter(o => input.gender ? o.gender === input.gender : true)
+            .map(o => o[study.expr[0].extract])
+        : ensure_map(study.expr[0].type)
+            && Object
+                .keys(study_vals)
+                .filter(k => ['a', '_'].indexOf(k[0]) === -1)
+                .map(k => study_vals[k]);
     if (!out)
         throw TypeError('Expected out to match something');
     return exports.uniq(out);
@@ -181,18 +191,26 @@ exports.pos_in_range = (ranges, num) => {
 exports.list_ethnicities = (risk_json) => {
     if (util_1.isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
-    return Object.keys(risk_json.studies).map(k => {
+    return Object
+        .keys(risk_json.studies)
+        .map(k => {
         return { [k]: risk_json.studies[k].ethnicities };
     });
 };
 exports.ethnicity2study = (risk_json) => {
     const o = {};
-    Object.keys(risk_json.studies).map(study_name => risk_json.studies[study_name].ethnicities.map(ethnicity => ({ [ethnicity]: study_name }))).reduce((a, b) => a.concat(b), []).forEach(obj => Object.assign(o, obj));
+    Object
+        .keys(risk_json.studies)
+        .map(study_name => risk_json.studies[study_name].ethnicities.map(ethnicity => ({ [ethnicity]: study_name })))
+        .reduce((a, b) => a.concat(b), [])
+        .forEach(obj => Object.assign(o, obj));
     return o;
 };
 exports.calc_default_multiplicative_risks = (risk_json, user) => {
     return {
-        age: risk_json.default_multiplicative_risks.age[Object.keys(risk_json.default_multiplicative_risks.age).filter(range => exports.in_range(range, user.age))[0]],
+        age: risk_json.default_multiplicative_risks.age[Object
+            .keys(risk_json.default_multiplicative_risks.age)
+            .filter(range => exports.in_range(range, user.age))[0]],
         myopia: user.myopia ? risk_json.default_multiplicative_risks.myopia.existent : 1,
         family_history: user.family_history ? risk_json.default_multiplicative_risks.family_history.existent : 1,
         diabetes: user.diabetes ? risk_json.default_multiplicative_risks.diabetes.existent : 1
@@ -200,19 +218,31 @@ exports.calc_default_multiplicative_risks = (risk_json, user) => {
 };
 exports.calc_relative_risk = (risk_json, input) => {
     const has_gender = input.gender != null;
-    const risk_per_study = has_gender ? Object.keys(risk_json.studies).map(study_name => ({
-        [study_name]: risk_json.studies[study_name].agenda != null ? risk_json.studies[study_name].agenda.filter(stat => input.gender === stat.gender && exports.in_range(stat.age, input.age))[0] : (age_range => ({
-            max_prevalence: risk_json.studies[study_name].age[age_range],
-            age: age_range[0]
-        }))(Object.keys(risk_json.studies[study_name].age).filter(age_range => exports.in_range(age_range, input.age)))
-    })).reduce((obj, item) => {
-        const k = Object.keys(item)[0];
-        obj[k] = item[k];
-        return obj;
-    }, {}) : null;
-    const relative_risk = Object.keys(risk_per_study).map(study_name => ({
+    const risk_per_study = has_gender ?
+        Object
+            .keys(risk_json.studies)
+            .map(study_name => ({
+            [study_name]: risk_json.studies[study_name].agenda != null ?
+                risk_json.studies[study_name].agenda
+                    .filter(stat => input.gender === stat.gender && exports.in_range(stat.age, input.age))[0]
+                : (age_range => ({
+                    max_prevalence: risk_json.studies[study_name].age[age_range],
+                    age: age_range[0]
+                }))(Object
+                    .keys(risk_json.studies[study_name].age)
+                    .filter(age_range => exports.in_range(age_range, input.age)))
+        }))
+            .reduce((obj, item) => {
+            const k = Object.keys(item)[0];
+            obj[k] = item[k];
+            return obj;
+        }, {}) : null;
+    const relative_risk = Object
+        .keys(risk_per_study)
+        .map(study_name => ({
         [study_name]: risk_per_study[study_name][risk_json.studies[study_name].expr[0].extract]
-    })).sort((a, b) => a[Object.keys(a)[0]] > b[Object.keys(b)[0]]);
+    }))
+        .sort((a, b) => a[Object.keys(a)[0]] > b[Object.keys(b)[0]]);
     const graphed_rr = relative_risk.map(atoi => {
         const study_name = Object.keys(atoi)[0];
         const risk_val = typeof atoi[study_name] === 'undefined' ?
@@ -228,29 +258,10 @@ exports.calc_relative_risk = (risk_json, input) => {
     return Object.assign({
         age: input.age,
         study: input.study,
-        risk_per_study,
+        rr: relative_risk,
+        risk_per_study: risk_per_study,
         graphed_rr
     }, has_gender ? { gender: input.gender } : {});
-};
-exports.all_studies_relative_risk = (risk_json) => {
-    const risk_per_study = Object.keys(risk_json.studies).map(study_name => ({
-        [study_name]: risk_json.studies[study_name].agenda != null ?
-            risk_json.studies[study_name].agenda : (age_range => ({
-            max_prevalence: risk_json.studies[study_name].age[age_range],
-            age: age_range[0]
-        }))(Object.keys(risk_json.studies[study_name].age))
-    })).reduce((obj, item) => {
-        const k = Object.keys(item)[0];
-        obj[k] = item[k];
-        return obj;
-    }, {});
-    return {
-        relative_risk: Object.keys(risk_per_study).map(study_name => ({
-            [study_name]: risk_per_study[study_name][Object.keys(risk_per_study[study_name]).indexOf('max_prevalence') > -1 ?
-                'max_prevalence' : 'meth3_prevalence']
-        })).sort((a, b) => a[Object.keys(a)[0]] > b[Object.keys(b)[0]]),
-        risk_per_study
-    };
 };
 if (require.main === module) {
     fs_1.exists('./risk.json', fs_exists => {
