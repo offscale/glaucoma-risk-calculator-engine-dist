@@ -15,6 +15,9 @@ describe('test ref to HTML', function () {
             })).replace('\n', '').replace('                 ', ' ');
         })
             .reduce(function (a, b) { return a.concat(b); });
+        risk_json.global_notes.push("Same multiplicative risks used for: myopia; hyperopia; diabetes; and family history, as per:" +
+            ("" + (new Cite(risk_json.default_multiplicative_risks.ref))
+                .get({ format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US' })));
         risk_json.html_of_all_refs = JSON.stringify(res_html);
         fs_1.writeFile('risk.json', jsonStableStringify(risk_json, { space: 4 }), 'utf8', function (err) {
             if (err)

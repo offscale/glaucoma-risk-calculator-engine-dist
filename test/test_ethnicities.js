@@ -44,6 +44,6 @@ describe('ethnicities', function () {
         var ethnicity2study_res = __1.ethnicity2study(risk_json);
         chai_1.expect(ethnicity2study_res).to.include.keys('White [Olmsted]');
         chai_1.expect(ethnicity2study_res['White [Olmsted]']).to.be.eql('olmsted');
-        chai_1.expect(Object.keys(ethnicity2study_res)).to.have.length(28);
+        chai_1.expect(Object.keys(ethnicity2study_res)).to.have.length(29);
     });
 });
