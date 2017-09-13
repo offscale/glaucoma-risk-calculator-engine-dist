@@ -10,7 +10,8 @@ describe('test ref to HTML', function () {
         var res_html = Object
             .keys(risk_json.studies)
             .map(function (study) {
-            return ("<h5>" + study[0].toUpperCase() + study.slice(1) + " [n=" + risk_json.studies[study].n + "]</h5>\n                 " + (new Cite(risk_json.studies[study].ref)).get({
+            return ("<h5>" + study[0].toUpperCase() + study.slice(1) + " [n=" + risk_json.studies[study].n + "]</h5>\n                 " + (typeof risk_json.studies[study].notes === 'undefined' ? ''
+                : '<ul>' + risk_json.studies[study].notes.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul>') + "\n                 " + (new Cite(risk_json.studies[study].ref)).get({
                 format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US'
             })).replace('\n', '').replace('                 ', ' ');
         })
@@ -19,7 +20,8 @@ describe('test ref to HTML', function () {
         if (last_elem.indexOf('Same multiplicative risks used for:') === -1)
             risk_json.global_notes.push(last_elem);
         risk_json.global_notes.push("Same multiplicative risks used for: myopia; hyperopia; diabetes; and family history, as per:" +
-            ("" + (new Cite(risk_json.default_multiplicative_risks.ref.concat(risk_json.default_family_history.ref)))
+            ("" + (new Cite(risk_json.default_multiplicative_risks.ref
+                .concat(risk_json.default_family_history.ref)))
                 .get({ format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US' })));
         risk_json.html_of_all_refs = JSON.stringify(res_html);
         fs_1.writeFile('risk.json', jsonStableStringify(risk_json, { space: 4 }), 'utf8', function (err) {
