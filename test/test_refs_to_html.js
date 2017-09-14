@@ -10,10 +10,11 @@ describe('test ref to HTML', function () {
         var res_html = Object
             .keys(risk_json.studies)
             .map(function (study) {
-            return ("<h5>" + study[0].toUpperCase() + study.slice(1) + " [n=" + risk_json.studies[study].n + "]</h5>\n                 " + (typeof risk_json.studies[study].notes === 'undefined' ? ''
-                : '<ul>' + risk_json.studies[study].notes.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul>') + "\n                 " + (new Cite(risk_json.studies[study].ref)).get({
-                format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US'
-            })).replace('\n', '').replace('                 ', ' ');
+            return "<h5>" + study[0].toUpperCase() + study.slice(1) + " [n=" + risk_json.studies[study].n + "]: "
+                + (risk_json.studies[study].ethnicities[0] + "</h5>\n                 " + (typeof risk_json.studies[study].notes === 'undefined' ? ''
+                    : '<ul>' + risk_json.studies[study].notes.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul>') + "\n                 " + (new Cite(risk_json.studies[study].ref)).get({
+                    format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US'
+                })).replace('\n', '').replace('                 ', ' ');
         })
             .reduce(function (a, b) { return a.concat(b); });
         var last_elem = risk_json.global_notes.pop();
