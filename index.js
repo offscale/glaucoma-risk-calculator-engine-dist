@@ -135,11 +135,14 @@ exports.risk_from_study = function (risk_json, input) {
     exports.preprocess_studies(risk_json);
     var study = risk_json.studies[input.study];
     var study_vals = study[study.expr[0].key];
-    var out = util_1.isArray(study_vals) ? study_vals.filter(function (o) {
-        return study.expr[0].filter.every(function (k) {
-            return k === 'age' ? exports.in_range(o.age, input.age) : input.hasOwnProperty(k) ? o[k] === input[k] : true;
-        });
-    })[study.expr[0].take > 0 ? study.expr[0].take - 1 : 0]
+    var out = util_1.isArray(study_vals) ? study_vals
+        .filter(function (o) { return study.expr[0].filter
+        .every(function (k) {
+        return k === 'age' ?
+            exports.in_range(o.age, input.age) :
+            (input.hasOwnProperty(k) ?
+                o[k] === input[k] : true);
+    }); })[study.expr[0].take > 0 ? study.expr[0].take - 1 : 0]
         : study_vals[ensure_map(study.expr[0].type) && Object.keys(study_vals).filter(function (k) {
             return exports.in_range(k, input[study.expr[0].key]);
         })[study.expr[0].take - 1]];
@@ -249,15 +252,15 @@ exports.calc_relative_risk = function (risk_json, input) {
             .keys(risk_json.studies)
             .map(function (study_name) {
             return (_a = {},
-                _a[study_name] = risk_json.studies[study_name].agenda != null ?
-                    risk_json.studies[study_name].agenda
-                        .filter(function (stat) { return input.gender === stat.gender && exports.in_range(stat.age, input.age); })[0]
-                    : (function (age_range) { return ({
+                _a[study_name] = risk_json.studies[study_name].agenda == null ?
+                    (function (age_range) { return ({
                         max_prevalence: risk_json.studies[study_name].age[age_range],
                         age: age_range[0]
                     }); })(Object
                         .keys(risk_json.studies[study_name].age)
-                        .filter(function (age_range) { return exports.in_range(age_range, input.age); })),
+                        .filter(function (age_range) { return exports.in_range(age_range, input.age); }))
+                    : risk_json.studies[study_name].agenda
+                        .filter(function (stat) { return input.gender === stat.gender && exports.in_range(stat.age, input.age); })[0],
                 _a);
             var _a;
         })
