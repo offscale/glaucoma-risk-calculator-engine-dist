@@ -17,6 +17,10 @@ Then
 
 ## Generate dist repo
 
-On a mchine with GNU findutils and `cpio`:
+On a machine with GNU findutils and `cpio`:
 
     find -type f -not -name "*.ts" -and -not -path "./.git/*" -and -not -path "./node-modules/*" -and -not -name '*.map' | cpio -pdamv ../glaucoma-risk-calc-engine-dist
+
+Alternatively a simple:
+
+    cp -r ../glaucoma-risk-calculator-engine/{test,*.js*,*.md} .
