@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = require("util");
-var fs_1 = require("fs");
 var assert = require("assert");
 var math = require("mathjs");
 exports.ethnicities_pretty = function (ethnicities) {
@@ -296,17 +295,3 @@ exports.calc_relative_risk = function (risk_json, input) {
         graphed_rr: graphed_rr
     }, has_gender ? { gender: input.gender } : {});
 };
-if (require.main === module) {
-    fs_1.exists('./risk.json', function (fs_exists) {
-        console.error("fs_exists = " + fs_exists);
-        fs_1.writeFile('/tmp/a.txt', "fs_exists = " + fs_exists, function (err) {
-            if (err)
-                throw err;
-            fs_1.readFile('./risk.json', 'utf8', function (e, data) {
-                if (e)
-                    throw e;
-                console.info(data);
-            });
-        });
-    });
-}
