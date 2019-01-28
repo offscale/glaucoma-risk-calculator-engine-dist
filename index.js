@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var util_1 = require("util");
 var assert = require("assert");
 var math = require("mathjs");
+var isNullOrUndefined = function (o) { return o == null; };
+var isNumber = function (n) { return !isNullOrUndefined(n) && typeof n === 'number'; };
 exports.ethnicities_pretty = function (ethnicities) {
     return ethnicities.map(function (study) { return (function (study_name) { return study_name + ": " + study[study_name].join(', '); })(Object.keys(study)[0]); });
 };
@@ -62,6 +63,7 @@ exports.uniq2 = function (arr) {
 };
 exports.preprocess_studies = function (risk_json) {
     Object.keys(risk_json.studies).forEach(function (study_name) {
+        var _a;
         if (risk_json.studies[study_name].hasOwnProperty('age')) {
             if (!risk_json.studies[study_name].hasOwnProperty('age_map') || !risk_json.studies[study_name].age_map.size)
                 risk_json.studies[study_name].age_map = new Map();
@@ -104,7 +106,6 @@ exports.preprocess_studies = function (risk_json) {
             assert.equal(gendersAssigned_1, all_genders_seen.length, 'Genders assigned != all genders');
             risk_json.studies[study_name].agenda = exports.uniq2(risk_json.studies[study_name].agenda);
         }
-        var _a;
     });
     return risk_json;
 };
@@ -127,14 +128,14 @@ var ensure_map = function (k) {
     throw TypeError("Expected map, got " + k);
 };
 exports.risk_from_study = function (risk_json, input) {
-    if (util_1.isNullOrUndefined(risk_json))
+    if (isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
-    else if (util_1.isNullOrUndefined(input))
+    else if (isNullOrUndefined(input))
         throw TypeError('`input` must be defined');
     exports.preprocess_studies(risk_json);
     var study = risk_json.studies[input.study];
     var study_vals = study[study.expr[0].key];
-    var out = util_1.isArray(study_vals) ? study_vals
+    var out = Array.isArray(study_vals) ? study_vals
         .filter(function (o) { return study.expr[0].filter
         .every(function (k) {
         return k === 'age' ?
@@ -147,7 +148,7 @@ exports.risk_from_study = function (risk_json, input) {
         })[study.expr[0].take - 1]];
     if (!out)
         throw TypeError('Expected out to match something');
-    return util_1.isNumber(out) ? out : out[study.expr[0].extract];
+    return isNumber(out) ? out : out[study.expr[0].extract];
 };
 exports.familial_risks_from_study = function (risk_json, input, warn) {
     if (warn === void 0) { warn = true; }
@@ -172,14 +173,14 @@ exports.combined_risk = function (familial_risks_from_study_l, risk_from_studies
         .reduce(math.add), risk_from_studies);
 };
 exports.risks_from_study = function (risk_json, input) {
-    if (util_1.isNullOrUndefined(risk_json))
+    if (isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
-    else if (util_1.isNullOrUndefined(input))
+    else if (isNullOrUndefined(input))
         throw TypeError('`input` must be defined');
     exports.preprocess_studies(risk_json);
     var study = risk_json.studies[input.study];
     var study_vals = study[study.expr[0].key];
-    var out = util_1.isArray(study_vals) ?
+    var out = Array.isArray(study_vals) ?
         study_vals
             .filter(function (o) { return input.gender ? o.gender === input.gender : true; })
             .map(function (o) { return o[study.expr[0].extract]; })
@@ -193,9 +194,9 @@ exports.risks_from_study = function (risk_json, input) {
     return exports.uniq(out);
 };
 exports.place_in_array = function (entry, a) {
-    if (util_1.isNullOrUndefined(entry))
+    if (isNullOrUndefined(entry))
         throw TypeError('`entry` must be defined');
-    else if (util_1.isNullOrUndefined(a))
+    else if (isNullOrUndefined(a))
         throw TypeError('`a` must be defined');
     var sortedA = a.sort();
     for (var i = 0; i < sortedA.length; i++)
@@ -211,13 +212,13 @@ exports.pos_in_range = function (ranges, num) {
     return -1;
 };
 exports.list_ethnicities = function (risk_json) {
-    if (util_1.isNullOrUndefined(risk_json))
+    if (isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
     return Object
         .keys(risk_json.studies)
         .map(function (k) {
-        return _a = {}, _a[k] = risk_json.studies[k].ethnicities, _a;
         var _a;
+        return _a = {}, _a[k] = risk_json.studies[k].ethnicities, _a;
     });
 };
 exports.ethnicity2study = function (risk_json) {
@@ -226,8 +227,8 @@ exports.ethnicity2study = function (risk_json) {
         .keys(risk_json.studies)
         .map(function (study_name) {
         return risk_json.studies[study_name].ethnicities.map(function (ethnicity) {
-            return (_a = {}, _a[ethnicity] = study_name, _a);
             var _a;
+            return (_a = {}, _a[ethnicity] = study_name, _a);
         });
     })
         .reduce(function (a, b) { return a.concat(b); }, [])
@@ -250,6 +251,7 @@ exports.calc_relative_risk = function (risk_json, input) {
         Object
             .keys(risk_json.studies)
             .map(function (study_name) {
+            var _a;
             return (_a = {},
                 _a[study_name] = risk_json.studies[study_name].agenda == null ?
                     (function (age_range) { return ({
@@ -261,7 +263,6 @@ exports.calc_relative_risk = function (risk_json, input) {
                     : risk_json.studies[study_name].agenda
                         .filter(function (stat) { return input.gender === stat.gender && exports.in_range(stat.age, input.age); })[0],
                 _a);
-            var _a;
         })
             .reduce(function (obj, item) {
             var k = Object.keys(item)[0];
@@ -271,12 +272,12 @@ exports.calc_relative_risk = function (risk_json, input) {
     var relative_risk = Object
         .keys(risk_per_study)
         .map(function (study_name) {
+        var _a;
         return (_a = {},
             _a[study_name] = risk_per_study[study_name][risk_json.studies[study_name].expr[0].extract] || risk_per_study[study_name][Object
                 .keys(risk_per_study[study_name])
                 .filter(function (k) { return typeof risk_per_study[study_name][k] === 'number'; })[0]],
             _a);
-        var _a;
     })
         .sort(function (a, b) { return a[Object.keys(a)[0]] > b[Object.keys(b)[0]]; });
     var graphed_rr = relative_risk.map(function (atoi) {
