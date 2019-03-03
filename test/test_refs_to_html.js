@@ -20,7 +20,7 @@ describe('test ref to HTML', function () {
         var last_elem = risk_json.global_notes.pop();
         if (last_elem.indexOf('Same multiplicative risks used for:') === -1)
             risk_json.global_notes.push(last_elem);
-        risk_json.global_notes.push("Same multiplicative risks used for: myopia; hyperopia; diabetes; and family history, as per:" +
+        risk_json.global_notes.push("With the exception of the Korean study, the same multiplicative risks are used for: myopia; hyperopia; diabetes; and family history, as per:" +
             ("" + (new Cite(risk_json.default_multiplicative_risks.ref
                 .concat(risk_json.default_family_history.ref)))
                 .get({ format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US' })));
