@@ -25,7 +25,7 @@ describe('test ref to HTML', function () {
                 .concat(risk_json.default_family_history.ref)))
                 .get({ format: 'string', type: 'html', style: 'citation-harvard1', lang: 'en-US' })));
         risk_json.html_of_all_refs = JSON.stringify(res_html);
-        fs_1.writeFile('risk.json', jsonStableStringify(risk_json, { space: 4 }), 'utf8', function (err) {
+        fs_1.writeFile('risk.json', jsonStableStringify(risk_json, { space: 2 }), 'utf8', function (err) {
             if (err)
                 return done(err);
             var er = void 0;

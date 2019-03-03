@@ -25,6 +25,6 @@ describe('ethnicities', function () {
         var ethnicity = 'White (German; Norwegian; Irish; English)';
         chai_1.expect(ethnicity2study_res).to.include.keys(ethnicity);
         chai_1.expect(ethnicity2study_res[ethnicity]).to.be.eql('olmsted');
-        chai_1.expect(Object.keys(ethnicity2study_res)).to.have.length(10);
+        chai_1.expect(Object.keys(ethnicity2study_res)).to.have.length(11);
     });
 });
