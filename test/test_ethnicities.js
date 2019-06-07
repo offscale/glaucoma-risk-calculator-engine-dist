@@ -7,6 +7,7 @@ describe('ethnicities', function () {
     it('lists ethnicities', function () {
         var ethnicity_list = __1.list_ethnicities(risk_json);
         chai_1.expect(ethnicity_list).to.be.an.instanceof(Array);
+        chai_1.expect(ethnicity_list).to.have.length(11);
         chai_1.expect(ethnicity_list.filter(function (o) { return Object.keys(o)[0] === 'olmsted'; })[0]['olmsted']).to.be.eql([
             'White (German; Norwegian; Irish; English)'
         ]);
