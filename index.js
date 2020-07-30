@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.calc_relative_risk = exports.calc_default_multiplicative_risks = exports.ethnicity2study = exports.list_ethnicities = exports.pos_in_range = exports.place_in_array = exports.risks_from_study = exports.combined_risk = exports.familial_risks_from_study = exports.risk_from_study = exports.sort_ranges = exports.preprocess_studies = exports.uniq2 = exports.uniq = exports.lowest_range = exports.in_range = exports.s_col_to_s = exports.ethnicities_pretty = void 0;
 var assert = require("assert");
 var math = require("mathjs");
 var isNullOrUndefined = function (o) { return o == null; };
