@@ -5,11 +5,13 @@ var assert = require("assert");
 var math = require("mathjs");
 var isNullOrUndefined = function (o) { return o == null; };
 var isNumber = function (n) { return !isNullOrUndefined(n) && typeof n === 'number'; };
-exports.ethnicities_pretty = function (ethnicities) {
+var ethnicities_pretty = function (ethnicities) {
     return ethnicities.map(function (study) { return (function (study_name) { return study_name + ": " + study[study_name].join(', '); })(Object.keys(study)[0]); });
 };
-exports.s_col_to_s = function (s) { return s.slice(0, s.indexOf(':')); };
-exports.in_range = function (range, num) {
+exports.ethnicities_pretty = ethnicities_pretty;
+var s_col_to_s = function (s) { return s.slice(0, s.indexOf(':')); };
+exports.s_col_to_s = s_col_to_s;
+var in_range = function (range, num) {
     if (range === 'all' || range[0] === '_')
         return false;
     var dash = range.indexOf('-');
@@ -40,19 +42,22 @@ exports.in_range = function (range, num) {
         return num >= rest;
     return range === num;
 };
-exports.lowest_range = function (ranges) {
+exports.in_range = in_range;
+var lowest_range = function (ranges) {
     return ranges.reduce(function (prevNum, currentValue) {
         var curNum = parseInt(currentValue, 10);
         return curNum < prevNum ? curNum : prevNum;
     }, 100);
 };
-exports.uniq = function (a) {
+exports.lowest_range = lowest_range;
+var uniq = function (a) {
     var seen = {};
     return a.filter(function (item) {
         return seen.hasOwnProperty(item) ? false : (seen[item] = true);
     }).filter(function (k) { return k !== undefined; });
 };
-exports.uniq2 = function (arr) {
+exports.uniq = uniq;
+var uniq2 = function (arr) {
     var keys = arr.length === 0 ? [] : Object.keys(arr[0]);
     var seen = new Map();
     arr.forEach(function (a) {
@@ -62,7 +67,8 @@ exports.uniq2 = function (arr) {
     });
     return Array.from(seen.values());
 };
-exports.preprocess_studies = function (risk_json) {
+exports.uniq2 = uniq2;
+var preprocess_studies = function (risk_json) {
     Object.keys(risk_json.studies).forEach(function (study_name) {
         var _a;
         if (risk_json.studies[study_name].hasOwnProperty('age')) {
@@ -110,7 +116,8 @@ exports.preprocess_studies = function (risk_json) {
     });
     return risk_json;
 };
-exports.sort_ranges = function (ranges) {
+exports.preprocess_studies = preprocess_studies;
+var sort_ranges = function (ranges) {
     return ranges.sort(function (a, b) {
         if (a[0] === '<')
             return -1;
@@ -123,12 +130,13 @@ exports.sort_ranges = function (ranges) {
         return parseInt(a.split('-')[0], 10) - parseInt(b.split('-')[0], 10);
     });
 };
+exports.sort_ranges = sort_ranges;
 var ensure_map = function (k) {
     if (k === 'map')
         return true;
     throw TypeError("Expected map, got " + k);
 };
-exports.risk_from_study = function (risk_json, input) {
+var risk_from_study = function (risk_json, input) {
     if (isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
     else if (isNullOrUndefined(input))
@@ -151,7 +159,8 @@ exports.risk_from_study = function (risk_json, input) {
         throw TypeError('Expected out to match something');
     return isNumber(out) ? out : out[study.expr[0].extract];
 };
-exports.familial_risks_from_study = function (risk_json, input, warn) {
+exports.risk_from_study = risk_from_study;
+var familial_risks_from_study = function (risk_json, input, warn) {
     if (warn === void 0) { warn = true; }
     var study = risk_json.studies[input.study];
     var res = [];
@@ -168,12 +177,14 @@ exports.familial_risks_from_study = function (risk_json, input, warn) {
     input.parent && res.push(study['sibling_pc']);
     return res;
 };
-exports.combined_risk = function (familial_risks_from_study_l, risk_from_studies) {
+exports.familial_risks_from_study = familial_risks_from_study;
+var combined_risk = function (familial_risks_from_study_l, risk_from_studies) {
     return math.add(familial_risks_from_study_l
         .map(function (r) { return math.multiply(math.divide(r, 100), risk_from_studies); })
         .reduce(math.add), risk_from_studies);
 };
-exports.risks_from_study = function (risk_json, input) {
+exports.combined_risk = combined_risk;
+var risks_from_study = function (risk_json, input) {
     if (isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
     else if (isNullOrUndefined(input))
@@ -194,7 +205,8 @@ exports.risks_from_study = function (risk_json, input) {
         throw TypeError('Expected out to match something');
     return exports.uniq(out);
 };
-exports.place_in_array = function (entry, a) {
+exports.risks_from_study = risks_from_study;
+var place_in_array = function (entry, a) {
     if (isNullOrUndefined(entry))
         throw TypeError('`entry` must be defined');
     else if (isNullOrUndefined(a))
@@ -205,14 +217,16 @@ exports.place_in_array = function (entry, a) {
             return i;
     return -1;
 };
-exports.pos_in_range = function (ranges, num) {
+exports.place_in_array = place_in_array;
+var pos_in_range = function (ranges, num) {
     ranges = exports.sort_ranges(ranges);
     for (var i = 0; i < ranges.length; i++)
         if (exports.in_range(ranges[i], num))
             return i;
     return -1;
 };
-exports.list_ethnicities = function (risk_json) {
+exports.pos_in_range = pos_in_range;
+var list_ethnicities = function (risk_json) {
     if (isNullOrUndefined(risk_json))
         throw TypeError('`risk_json` must be defined');
     return Object
@@ -222,7 +236,8 @@ exports.list_ethnicities = function (risk_json) {
         return _a = {}, _a[k] = risk_json.studies[k].ethnicities, _a;
     });
 };
-exports.ethnicity2study = function (risk_json) {
+exports.list_ethnicities = list_ethnicities;
+var ethnicity2study = function (risk_json) {
     var o = {};
     Object
         .keys(risk_json.studies)
@@ -236,7 +251,8 @@ exports.ethnicity2study = function (risk_json) {
         .forEach(function (obj) { return Object.assign(o, obj); });
     return o;
 };
-exports.calc_default_multiplicative_risks = function (risk_json, user) {
+exports.ethnicity2study = ethnicity2study;
+var calc_default_multiplicative_risks = function (risk_json, user) {
     return {
         age: risk_json.default_multiplicative_risks.age[Object
             .keys(risk_json.default_multiplicative_risks.age)
@@ -246,7 +262,8 @@ exports.calc_default_multiplicative_risks = function (risk_json, user) {
         diabetes: user.diabetes ? risk_json.default_multiplicative_risks.diabetes.existent : 1
     };
 };
-exports.calc_relative_risk = function (risk_json, input) {
+exports.calc_default_multiplicative_risks = calc_default_multiplicative_risks;
+var calc_relative_risk = function (risk_json, input) {
     var has_gender = input.gender != null;
     var risk_per_study = has_gender ?
         Object
@@ -297,3 +314,4 @@ exports.calc_relative_risk = function (risk_json, input) {
         graphed_rr: graphed_rr
     }, has_gender ? { gender: input.gender } : {});
 };
+exports.calc_relative_risk = calc_relative_risk;
